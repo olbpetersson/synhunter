@@ -1,6 +1,7 @@
 <template>
   <md-card>
-    <md-button style="min-width: 0; padding: 0;" @click="foo">{{word}}</md-button>
+    <md-button class="foobar" v-if="!tile.state">{{tile.word}}</md-button>
+    <img class="card-logo" v-else src="/static/logo.png">
   </md-card>
 </template>
 <script>
@@ -8,10 +9,10 @@
     data() {
       return {};
     },
-    props: ['id', 'word'],
+    props: ['tile'],
     methods: {
       foo() {
-        console.log(this.id, this.word);
+        // console.log(this.id, this.word);
       }
     }
   };
@@ -20,4 +21,13 @@
   /*.container {
     padding: 8px;
   }*/
+  .foobar {
+    min-width: 0;
+    padding: 0;
+  }
+  .card-logo {
+    display: block;
+    margin: 0 auto;
+    vertical-align: middle;
+  }
 </style>

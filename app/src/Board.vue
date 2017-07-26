@@ -7,7 +7,7 @@
     <md-layout md-column class="container" v-if="gameStateView">
       <md-layout v-for="row in gameStateView" class="row">
         <md-layout v-for="tile in row" class="tile" md-gutter>
-          <tile id="0" :word="tile.word"/>
+          <tile :tile="tile" @click="chooseTile(tile.id)"></tile>
         </md-layout>
       </md-layout>
     </md-layout>
@@ -54,11 +54,9 @@ import JsonRpc from './JsonRpc';
         let payload = new JsonRpc('foo', 1, 0);
         console.log("sending payload", payload);
         this.send(payload);
-        //this.socket.send(payload);
       },
-      chooseTile() {
-        let apa = "4da2dae4-3982-482d-8e3d-42fd983ddaeb";
-        let payload = new JsonRpc('choose_tile', [apa], 2);
+      chooseTile(uuid) {
+        let payload = new JsonRpc('choose_tile', [uuid], 2);
         console.log("sending choose tile", payload);
         this.send(payload);
       },
