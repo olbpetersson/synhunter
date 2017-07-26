@@ -14,16 +14,21 @@ import JsonRpc from 'JsonRpc'
 export default {
   data() {
     return {
-      value: null
+      value: null,
+      label: null
     };
   },
-  props: ['label','send'],
-  created() {},
+  props: ['send', 'isLeader'],
+  mounted() {
+    this.label= this.isLeader ? "Answer" : "Hint";
+  },
   methods: {
     submit() {
-      let payload = new JsonRpc('submit_answer', [this.value],999);
+      let method = this.isLeader ? "submit_answer" : "submit_hint";
+      let payload = new JsonRpc(method, [this.value],999);
       console.log("sending submit answer", this.value);
       this.send(payload);
+      console.log("is leader inna da gameinput", this.isLeader);
     }
   }
 };

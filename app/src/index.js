@@ -58,6 +58,6 @@ const app = new Vue({
   methods : {
     send(e) {
       this.socket.send(JSON.stringify(e));
-    }
+    },
   }
 });

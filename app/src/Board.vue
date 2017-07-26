@@ -83,6 +83,7 @@
             team.players.forEach(function (player) {
               if (player.id === component.currentPlayer.uuid) {
                 component.currentPlayer.team = team.color;
+                component.currentPlayer.isLeader = false;
               }
             });
 
@@ -92,7 +93,10 @@
             }
           });
         }
-        console.log("currentPlayer", component.currentPlayer);
+        console.log("CURRENTO PLAYER", component.currentPlayer, component.currentPlayer.isLeader);
+      },
+      isLeader() {
+        return this.currentPlayer && this.currentPlayer.isLeader;
       }
     },
     components: {Tile}
