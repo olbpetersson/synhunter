@@ -11,46 +11,22 @@
 </template>
 
 <script>
-  import Player from './Player'
+
 
   // const BASE_URL = 'ws://synhunter.mirkk.eu:1337';
-  const BASE_URL = 'ws://54.171.223.125:1337';
 
   export default {
     data() {
       return {
-        socket: null,
+        //socket: null,
         currentPlayer: null
       };
     },
     props: ['width', 'height'],
     created() {
       console.log('Board initialized', this.width, this.height);
-      this.socket = new WebSocket(BASE_URL);
 
-      this.socket.onopen = () => {
-        let payload = {
-          jsonrpc: "2.0",
-          method: 'game_subscribe',
-          params: [],
-          id: 1
-        };
-        console.log("Sending gamesubscribe", payload);
-        this.socket.send(JSON.stringify(payload));
-
-      };
-
-      this.socket.onmessage = (e) => {
-        let response = JSON.parse(e.data);
-        if (response.method) {
-          console.log("Subscribed to", response.method)
-        } else {
-          let uuid = response.result;
-          console.log("Creating a player with uuid", uuid);
-          this.currentPlayer = new Player(uuid, undefined, undefined);
-        }
-      };
-      this.socket.onerror = (e) => console.log("Got a websocket error", e);
+      this.$on('createPlayer', (e) => this.currentPlayer = e)
     },
     methods: {
       ping(i, j) {
@@ -61,7 +37,9 @@
           params: [(i*parseInt(this.height)) + j],
           id: 0
         };
-        this.socket.send(JSON.stringify(payload));
+        this.$broadcast('send', JSON.stringify(payload));
+
+        //this.socket.send(JSON.stringify(payload));
       }
     }
   };
