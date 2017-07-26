@@ -20,15 +20,16 @@ export default {
   },
   props: ['send', 'isLeader'],
   mounted() {
-    this.label= this.isLeader ? "Answer" : "Hint";
+    console.log("created gameinput", this.isLeader());
+    this.label= this.isLeader() ? "Answer" : "Hint";
   },
   methods: {
     submit() {
-      let method = this.isLeader ? "submit_answer" : "submit_hint";
+      let method = this.isLeader() ? "submit_answer" : "submit_hint";
       let payload = new JsonRpc(method, [this.value],999);
       console.log("sending submit answer", this.value);
       this.send(payload);
-      console.log("is leader inna da gameinput", this.isLeader);
+      console.log("is leader inna da gameinput", this.isLeader());
     }
   }
 };

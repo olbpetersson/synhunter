@@ -43,7 +43,7 @@
       <board ref="board" :send="send" width="5" height="5"></board>
     </md-layout>
     <md-whiteframe v-if="board && board.currentPlayer" >
-      <game-input ref="gameInput" :send="send" :isLeader="board.isLeader" ></game-input>
+      <game-input ref="gameInput" :send="send" :is-Leader="board.isLeader" ></game-input>
     </md-whiteframe>
   </md-layout>
 </md-layout>

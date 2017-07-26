@@ -26,6 +26,7 @@ const app = new Vue({
     this.socket = new WebSocket(BASE_URL);
     this.board = this.$refs.board;
     this.gameInput = this.$refs.gameInput;
+
     console.log("created board", this.board, this.gameInput);
 
     this.socket.onopen = () => {
