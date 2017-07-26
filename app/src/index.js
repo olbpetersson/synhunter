@@ -5,8 +5,9 @@ import VueMaterial from 'vue-material';
 
 import Board from 'Board.vue';
 import GameInput from 'GameInput.vue';
-import Player from './Player';
-import JsonRpc from './JsonRpc'
+import GameBoard from 'GameBoard'
+import Player from 'Player';
+import JsonRpc from 'JsonRpc'
 
 Vue.use(VueMaterial);
 
@@ -15,13 +16,16 @@ const app = new Vue({
   components: {Board, GameInput},
   data() {
     return {
-      socket: null
+      socket: null,
+      board: null
     }
   },
-  created() {
+  mounted() {
     const BASE_URL = 'ws://54.171.223.125:1337';
 
     this.socket = new WebSocket(BASE_URL);
+    this.board = this.$refs.board;
+    console.log("created board", this.board)
 
     this.socket.onopen = () => {
       let payload = new JsonRpc('game_subscribe', [], 1);
@@ -33,12 +37,13 @@ const app = new Vue({
     this.socket.onmessage = (e) => {
       let response = JSON.parse(e.data);
       if (response.method) {
-        console.log("Subscribed to", response);
-        this.$emit("game_state", )
-      } else {
+        let gameState = new GameBoard(response.params.result.board.teams, response.params.result.board.tiles);
+        console.log("Subscribed to asdf", gameState);
+        this.board.$emit('game_state', gameState);
+      } else if (response.result) {
         let uuid = response.result;
         console.log("Creating a player with uuid", uuid, response);
-        this.$emit('createPlayer', new Player(uuid, undefined, undefined));
+        this.board.$emit('create_player', new Player(uuid, undefined, undefined));
       }
     };
     this.socket.onerror = (e) => console.log("Got a websocket error", e);

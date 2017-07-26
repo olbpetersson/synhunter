@@ -34,8 +34,11 @@ import JsonRpc from './JsonRpc';
     created() {
       console.log('Board initialized', this.width, this.height);
 
-      this.$on('createPlayer', (e) => this.currentPlayer = e)
-      this.$on('game_state', state => (this.gameState = state))
+      this.$on('game_state', (state) => {
+        console.log('updating our gamestate in the herpyderpyboard');
+        return this.gameState = state;
+      });
+      this.$on('create_player', (e) => this.currentPlayer = e);
     },
     methods: {
       ping(i, j) {
