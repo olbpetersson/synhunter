@@ -4,15 +4,30 @@
 <meta charset="utf-8">
 <title>Synhunter</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style>
+#app {
+  height: 100vh;
+}
+.logo {
+  text-align: center;
+  padding: 8px 0;
+}
+</style>
 </head>
 <body>
-<div id="app">
-  <md-layout md-align="center">
-    <span class="md-headline">synhunter</span>
+<md-layout id="app" md-column>
+  <md-whiteframe class="logo">
+    <span class="md-headline">Synhunter</span>
+  </md-whiteframe>
+  <md-layout md-column md-flex>
+    <md-layout md-flex>
+      <board width="5" height="5"></board>
+    </md-layout>
+    <md-whiteframe>
+      <game-input label="Hint or answer"></game-input>
+    </md-whiteframe>
   </md-layout>
-  <board width="5" height="5"></board>
-  <game-input label="Hint or answer"></game-input>
-</div>
+</md-layout>
 <script src="/dist/index.bundle.js"></script>
 </body>
 </html>

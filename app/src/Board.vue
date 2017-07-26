@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <md-layout md-column class="container">
     <md-layout v-for="(row, i) in parseInt(height)" class="row">
       <md-layout v-for="(tile, j) in parseInt(width)" class="tile" md-gutter>
         <md-card>
@@ -7,7 +7,7 @@
         </md-card>
       </md-layout>
     </md-layout>
-  </div>
+  </md-layout>
 </template>
 
 <script>
@@ -66,8 +66,10 @@
     }
   };
 </script>
-
-<style>
+<style scoped>
+  .container {
+    margin-bottom: 8px;
+  }
   .row {
     padding-top: 8px;
   }

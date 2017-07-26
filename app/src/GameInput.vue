@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="container">
   <form novalidate @submit.stop.prevent="submit">
     <md-input-container>
       <label>{{label}}</label>
@@ -25,5 +25,8 @@ export default {
   }
 };
 </script>
-<style>
+<style scoped>
+.container {
+  padding: 8px;
+}
 </style>
