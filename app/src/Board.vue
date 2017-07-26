@@ -19,10 +19,10 @@
     data() {
       return {
         //socket: null,
-        currentPlayer: null
+        currentPlayer: null,
       };
     },
-    props: ['width', 'height'],
+    props: ['width', 'height', 'send'],
     created() {
       console.log('Board initialized', this.width, this.height);
 
@@ -37,8 +37,8 @@
           params: [(i*parseInt(this.height)) + j],
           id: 0
         };
-        this.$broadcast('send', JSON.stringify(payload));
-
+        console.log("sending payload", payload);
+        this.send(JSON.stringify(payload));
         //this.socket.send(JSON.stringify(payload));
       }
     }

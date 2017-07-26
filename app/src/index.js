@@ -36,15 +36,13 @@ const app = new Vue({
 
     this.socket.onmessage = (e) => {
       let response = JSON.parse(e.data);
-      console.log("apappapa", e);
       if (response.method) {
-
-        console.log("Subscribed to apapap", response)
+        console.log("Subscribed to", response);
+        this.$emit("game_state", )
       } else {
         let uuid = response.result;
-        console.log("Creating a player with uuid", new Player(uuid, undefined, undefined));
-        this.$emit('createPlayer',)
-        //this.currentPlayer =
+        console.log("Creating a player with uuid", uuid);
+        this.$emit('createPlayer', new Player(uuid, undefined, undefined));
       }
     };
     this.socket.onerror = (e) => console.log("Got a websocket error", e);
@@ -53,5 +51,10 @@ const app = new Vue({
       console.log('sending from index', e);
       this.socket.send(e);
     });
+  },
+  methods : {
+    send(e) {
+      this.socket.send(e);
+    }
   }
 });
