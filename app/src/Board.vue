@@ -1,6 +1,9 @@
 <template>
   <md-layout>
+
       <button @click="chooseTile"> APA</button>
+      <button @click="submitHint"> BEPA</button>
+
     <md-layout md-column class="container" v-if="gameState">
       <md-layout v-for="(row, i) in parseInt(height)" key="i" class="row">
         <md-layout v-for="(tile, j) in parseInt(width)" key="j" class="tile" md-gutter>
@@ -46,6 +49,12 @@ import JsonRpc from './JsonRpc';
         let apa = "4da2dae4-3982-482d-8e3d-42fd983ddaeb";
         let payload = new JsonRpc('choose_tile', [apa], 2);
         console.log("sending choose tile", payload);
+        this.send(payload);
+      },
+      submitHint() {
+        let bepa = "foobar";
+        let payload = new JsonRpc('submit_hint', [bepa], 2);
+        console.log("sending submit hint", payload);
         this.send(payload);
       }
     },
