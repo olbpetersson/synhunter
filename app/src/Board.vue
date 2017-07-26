@@ -7,7 +7,7 @@
     <md-layout md-column class="container" v-if="gameStateView">
       <md-layout v-for="row in gameStateView" class="row">
         <md-layout v-for="tile in row" class="tile" md-gutter>
-          <tile :tile="tile" @click="chooseTile(tile.id)"></tile>
+          <tile :tile="tile" :click="chooseTile"></tile>
         </md-layout>
       </md-layout>
     </md-layout>

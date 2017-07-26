@@ -1,6 +1,6 @@
 <template>
   <md-card>
-    <md-button class="foobar" v-if="!tile.state">{{tile.word}}</md-button>
+    <md-button class="foobar" @click="click(tile.id)" v-if="!tile.state">{{tile.word}}</md-button>
     <img class="card-logo" v-else src="/static/logo.png">
   </md-card>
 </template>
@@ -9,7 +9,7 @@
     data() {
       return {};
     },
-    props: ['tile'],
+    props: ['tile', 'click'],
     methods: {
       foo() {
         // console.log(this.id, this.word);
