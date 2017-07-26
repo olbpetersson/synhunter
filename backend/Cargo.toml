@@ -1,0 +1,16 @@
+[package]
+name = "backend"
+version = "0.1.0"
+authors = ["Linus Färnstrand <faern@faern.net>"]
+
+[dependencies]
+jsonrpc-core = { git = "https://github.com/paritytech/jsonrpc" }
+jsonrpc-macros = { git = "https://github.com/paritytech/jsonrpc" }
+jsonrpc-pubsub = { git = "https://github.com/paritytech/jsonrpc" }
+jsonrpc-ws-server = { git = "https://github.com/paritytech/jsonrpc" }
+serde = "1.0"
+serde_json = "1.0"
+serde_derive = "1.0"
+uuid = { version = "0.5", features = ["serde", "v4"] }
+error-chain = "0.10"
+rand = "0.3"
