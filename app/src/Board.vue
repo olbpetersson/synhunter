@@ -1,7 +1,7 @@
 <template>
   <md-layout md-column class="container">
-    <md-layout v-for="(row, i) in parseInt(height)" class="row">
-      <md-layout v-for="(tile, j) in parseInt(width)" class="tile" md-gutter>
+    <md-layout v-for="(row, i) in parseInt(height)" key="i" class="row">
+      <md-layout v-for="(tile, j) in parseInt(width)" key="j" class="tile" md-gutter>
         <md-card>
           <md-button @click="ping(i, j)">({{i}},{{j}})</md-button>
         </md-card>
