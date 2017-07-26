@@ -1,4 +1,4 @@
-node_modules/
+app/node_modules
 .idea/
 *.iml
 words/saoldict.txt
