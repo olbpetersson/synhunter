@@ -1,6 +1,6 @@
 <template>
   <md-card>
-    <md-button @click="foo">{{word}}</md-button>
+    <md-button style="min-width: 0; padding: 0;" @click="foo">{{word}}</md-button>
   </md-card>
 </template>
 <script>

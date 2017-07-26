@@ -1,17 +1,17 @@
 <template>
   <md-layout>
 
-      <button @click="chooseTile"> APA</button>
-      <button @click="submitHint"> BEPA</button>
+    <button @click="chooseTile"> APA</button>
+    <button @click="submitHint"> BEPA</button>
 
-    <md-layout md-column class="container" v-if="gameState">
-      <md-layout v-for="(row, i) in parseInt(height)" key="i" class="row">
-        <md-layout v-for="(tile, j) in parseInt(width)" key="j" class="tile" md-gutter>
-          <tile id="a" word="a"/>
+    <md-layout md-column class="container" v-if="gameStateView">
+      <md-layout v-for="row in gameStateView" class="row">
+        <md-layout v-for="tile in row" class="tile" md-gutter>
+          <tile id="0" :word="tile.word"/>
         </md-layout>
       </md-layout>
     </md-layout>
-    <md-layout md-column md-align="center" md-vertical-align="center">
+    <md-layout md-column md-align="center" md-vertical-align="center" v-else>
       <md-spinner md-indeterminate></md-spinner>
       <span class="md-title loading-text">Herp Derp...</span>
     </md-layout>
@@ -28,6 +28,7 @@ import JsonRpc from './JsonRpc';
       return {
         currentPlayer: null,
         gameState: null,
+        gameStateView: null
       };
     },
     props: ['width', 'height', 'send'],
@@ -36,7 +37,14 @@ import JsonRpc from './JsonRpc';
 
       this.$on('game_state', (state) => {
         console.log('updating our gamestate in the herpyderpyboard');
-        return this.gameState = state;
+        this.gameState = state;
+        this.gameStateView = {};
+        for (let tile of state.tiles) {
+          if (!this.gameStateView[tile.position[0]]) {
+            this.gameStateView[tile.position[0]] = {};
+          }
+          this.gameStateView[tile.position[0]][tile.position[1]] = tile;
+        }
       });
       this.$on('create_player', (e) => this.currentPlayer = e);
     },
