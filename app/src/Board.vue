@@ -1,25 +1,26 @@
 <template>
-  <md-layout md-column class="container">
-    <md-layout v-for="(row, i) in parseInt(height)" key="i" class="row">
-      <md-layout v-for="(tile, j) in parseInt(width)" key="j" class="tile" md-gutter>
-        <md-card>
-          <md-button @click="ping(i, j)">({{i}},{{j}})</md-button>
-        </md-card>
+  <md-layout>
+    <md-layout md-column class="container" v-if="gameState">
+      <md-layout v-for="(row, i) in parseInt(height)" key="i" class="row">
+        <md-layout v-for="(tile, j) in parseInt(width)" key="j" class="tile" md-gutter>
+          <tile id="a" word="a"/>
+        </md-layout>
       </md-layout>
+    </md-layout>
+    <md-layout md-column md-align="center" md-vertical-align="center" v-else>
+      <md-spinner md-indeterminate></md-spinner>
+      <span class="md-title loading-text">Herp Derp...</span>
     </md-layout>
   </md-layout>
 </template>
-
 <script>
-
-
-  // const BASE_URL = 'ws://synhunter.mirkk.eu:1337';
+  import Tile from 'Tile.vue';
 
   export default {
     data() {
       return {
-        //socket: null,
         currentPlayer: null,
+        gameState: null,
       };
     },
     props: ['width', 'height', 'send'],
@@ -27,6 +28,7 @@
       console.log('Board initialized', this.width, this.height);
 
       this.$on('createPlayer', (e) => this.currentPlayer = e)
+      this.$on('game_state', state => (this.gameState = state))
     },
     methods: {
       ping(i, j) {
@@ -41,10 +43,14 @@
         this.send(JSON.stringify(payload));
         //this.socket.send(JSON.stringify(payload));
       }
-    }
+    },
+    components: {Tile}
   };
 </script>
 <style scoped>
+  .loading-text {
+    margin-top: 12px;
+  }
   .container {
     margin-bottom: 8px;
   }
