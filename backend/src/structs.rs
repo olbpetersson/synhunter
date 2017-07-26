@@ -50,6 +50,8 @@ impl Game {
                     }
                     println!("Player {} added hint {}", player, hint);
                     self.turn.hints.insert(player, hint);
+                } else if self.turn.spyhint.is_none() {
+                    self.turn.spyhint = Some(hint);
                 }
             }
         } else {
@@ -241,6 +243,7 @@ pub struct Turn {
     team: TeamRef,
     tile: Option<Uuid>,
     hints: HashMap<PlayerRef, String>,
+    spyhint: Option<String>,
     answer: Option<String>,
 }
 
@@ -250,6 +253,7 @@ impl Turn {
             team,
             tile: None,
             hints: HashMap::new(),
+            spyhint: None,
             answer: None,
         }
     }

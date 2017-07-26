@@ -1,6 +1,6 @@
 
 use jsonrpc_core::{Error, Metadata, MetaIoHandler};
-use jsonrpc_core::futures::{BoxFuture, Future, future, sync};
+use jsonrpc_core::futures::{BoxFuture, Future, future};
 use jsonrpc_macros::pubsub;
 use jsonrpc_pubsub::{PubSubHandler, PubSubMetadata, Session, SubscriptionId};
 use jsonrpc_ws_server::{self, MetaExtractor, Server, ServerBuilder};
@@ -107,7 +107,7 @@ impl GameApi for GameServer {
         future::ok(i+100).boxed()
     }
 
-    fn reset_game(&self, meta: Self::Metadata) -> BoxFuture<(), Error> {
+    fn reset_game(&self, _meta: Self::Metadata) -> BoxFuture<(), Error> {
         let mut state = self.state.lock().unwrap();
         state.reset_game();
         state.broadcast_state();
@@ -183,7 +183,6 @@ pub fn create_server() -> RpcServer {
 
 
 pub struct RpcServer {
-    address: String,
     server: Server,
 }
 
@@ -199,7 +198,6 @@ impl RpcServer {
             .map(
                 |server| {
                     RpcServer {
-                        address: format!("ws://{}", server.addr()),
                         server: server,
                     }
                 },
