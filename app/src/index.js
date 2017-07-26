@@ -20,6 +20,13 @@ const app = new Vue({
       board: null
     }
   },
+  watch: {
+    'board.isLeader': function(isLeader) {
+      if (this.gameInput) {
+        this.gameInput.label = isLeader ? 'Leader' : 'Not leader';
+      }
+    }
+  },
   mounted() {
     const BASE_URL = 'ws://54.171.223.125:1337';
 
@@ -60,5 +67,12 @@ const app = new Vue({
     send(e) {
       this.socket.send(JSON.stringify(e));
     },
+    submit() {
+      let method = this.board.isLeader ? "submit_answer" : "submit_hint";
+      let payload = new JsonRpc(method, [this.value],999);
+      console.log("sending submit answer", this.value);
+      this.send(payload);
+      console.log("is leader inna da gameinput", this.board.isLeader);
+    }
   }
 });

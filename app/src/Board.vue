@@ -5,8 +5,8 @@
     <button @click="submitHint"> BEPA</button>
 
     <md-layout md-column class="container" v-if="gameStateView">
-      <md-layout v-for="row in gameStateView" class="row">
-        <md-layout v-for="tile in row" class="tile" md-gutter>
+      <md-layout v-for="row in gameStateView" key="row" class="row">
+        <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
           <tile :tile="tile" :click="chooseTile"></tile>
         </md-layout>
       </md-layout>
@@ -37,10 +37,14 @@
         gameStateView: null
       };
     },
+    computed: {
+      isLeader: function() {
+        return this.currentPlayer && this.currentPlayer.isLeader;
+      }
+    },
     props: ['width', 'height', 'send'],
     mounted() {
       console.log('Board initialized', this.width, this.height);
-
       this.$on('game_state', (state) => {
         console.log('updating our gamestate in the herpyderpyboard', state);
         this.gameState = state;
@@ -51,12 +55,12 @@
           }
           this.gameStateView[tile.position[0]][tile.position[1]] = tile;
         }
-        this.updatePlayerState(this);
+        this.updatePlayerState();
       });
       this.$on('create_player', (uuid) => {
         this.currentPlayer.uuid = uuid;
         console.log("asdf player", this.currentPlayer.uuid, uuid);
-        this.updatePlayerState(this);
+        this.updatePlayerState();
       });
     },
     methods: {
@@ -77,26 +81,22 @@
         console.log("sending submit hint", payload);
         this.send(payload);
       },
-      updatePlayerState(component){
-        if(component.currentPlayer && component.gameState){
-          component.gameState.teams.forEach(function (team) {
-            team.players.forEach(function (player) {
-              if (player.id === component.currentPlayer.uuid) {
-                component.currentPlayer.team = team.color;
-                component.currentPlayer.isLeader = false;
+      updatePlayerState() {
+        if(this.currentPlayer && this.gameState){
+          this.gameState.teams.forEach((team) => {
+            team.players.forEach((player) => {
+              if (player.id === this.currentPlayer.uuid) {
+                this.$set(this.currentPlayer, 'isLeader', false);
+                this.$set(this.currentPlayer, 'team', team.color);
               }
             });
 
-            if (team.leader === component.currentPlayer.uuid) {
-              component.currentPlayer.isLeader = true;
-              component.currentPlayer.team = team.color;
+            if (team.leader === this.currentPlayer.uuid) {
+              this.$set(this.currentPlayer, 'isLeader', true);
+              this.$set(this.currentPlayer, 'team', team.color);
             }
           });
         }
-        console.log("CURRENTO PLAYER", component.currentPlayer, component.currentPlayer.isLeader);
-      },
-      isLeader() {
-        return this.currentPlayer && this.currentPlayer.isLeader;
       }
     },
     components: {Tile}
