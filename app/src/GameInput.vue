@@ -10,17 +10,20 @@
 </div>
 </template>
 <script>
+import JsonRpc from 'JsonRpc'
 export default {
   data() {
     return {
       value: null
     };
   },
-  props: ['label'],
+  props: ['label','send'],
   created() {},
   methods: {
     submit() {
-      // todo: send to server
+      let payload = new JsonRpc('submit_answer', [this.value],999);
+      console.log("sending submit answer", this.value);
+      this.send(payload);
     }
   }
 };

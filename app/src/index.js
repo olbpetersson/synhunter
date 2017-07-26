@@ -25,7 +25,8 @@ const app = new Vue({
 
     this.socket = new WebSocket(BASE_URL);
     this.board = this.$refs.board;
-    console.log("created board", this.board)
+    this.gameInput = this.$refs.gameInput;
+    console.log("created board", this.board, this.gameInput);
 
     this.socket.onopen = () => {
       let payload = new JsonRpc('game_subscribe', [], 1);
