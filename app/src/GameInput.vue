@@ -15,7 +15,7 @@ export default {
   data() {
     return {
       value: null,
-      label: null
+      label: 'Hint/Answer'
     };
   },
   props: ['submit']

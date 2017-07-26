@@ -1,9 +1,13 @@
 <template>
-  <md-layout>
-
-    <button @click="chooseTile"> APA</button>
-    <button @click="submitHint"> BEPA</button>
-
+  <md-layout md-column>
+    <div v-if="currentPlayer && currentPlayer.isLeader">
+      <md-layout md-align="center">
+        <span class="md-headline">You are the leader!</span>
+      </md-layout>
+      <md-layout md-align="center" v-for="hint in gameState.turn.hints">
+        <span>{{hint}}</span>
+      </md-layout>
+    </div>
     <md-layout md-column class="container" v-if="gameStateView">
       <md-layout v-for="row in gameStateView" key="row" class="row">
         <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
@@ -14,12 +18,6 @@
     <md-layout md-column md-align="center" md-vertical-align="center" v-else>
       <md-spinner md-indeterminate></md-spinner>
       <span class="md-title loading-text">Herp Derp...</span>
-    </md-layout>
-    <md-layout v-if="currentPlayer && currentPlayer.isLeader">
-        <strong>You are the leader!</strong>
-        <div v-for="hint in gameState.turn.hints">
-            <span>hint</span>
-        </div>
     </md-layout>
   </md-layout>
 </template>
