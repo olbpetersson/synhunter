@@ -6,6 +6,7 @@ import VueMaterial from 'vue-material';
 import Board from 'Board.vue';
 import GameInput from 'GameInput.vue';
 import Player from './Player';
+import JsonRpc from './JsonRpc'
 
 Vue.use(VueMaterial);
 
@@ -23,14 +24,9 @@ const app = new Vue({
     this.socket = new WebSocket(BASE_URL);
 
     this.socket.onopen = () => {
-      let payload = {
-        jsonrpc: "2.0",
-        method: 'game_subscribe',
-        params: [],
-        id: 1
-      };
+      let payload = new JsonRpc('game_subscribe', [], 1);
       console.log("Sending gamesubscribe", payload);
-      this.socket.send(JSON.stringify(payload));
+      this.send(payload);
 
     };
 
@@ -41,7 +37,7 @@ const app = new Vue({
         this.$emit("game_state", )
       } else {
         let uuid = response.result;
-        console.log("Creating a player with uuid", uuid);
+        console.log("Creating a player with uuid", uuid, response);
         this.$emit('createPlayer', new Player(uuid, undefined, undefined));
       }
     };
@@ -49,12 +45,12 @@ const app = new Vue({
 
     this.$on('send', (e) => {
       console.log('sending from index', e);
-      this.socket.send(e);
+      this.socket.send(JSON.stringify(e));
     });
   },
   methods : {
     send(e) {
-      this.socket.send(e);
+      this.socket.send(JSON.stringify(e));
     }
   }
 });

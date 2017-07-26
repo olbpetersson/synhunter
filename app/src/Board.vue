@@ -1,5 +1,6 @@
 <template>
   <md-layout>
+      <button @click="chooseTile"> APA</button>
     <md-layout md-column class="container" v-if="gameState">
       <md-layout v-for="(row, i) in parseInt(height)" key="i" class="row">
         <md-layout v-for="(tile, j) in parseInt(width)" key="j" class="tile" md-gutter>
@@ -7,7 +8,7 @@
         </md-layout>
       </md-layout>
     </md-layout>
-    <md-layout md-column md-align="center" md-vertical-align="center" v-else>
+    <md-layout md-column md-align="center" md-vertical-align="center">
       <md-spinner md-indeterminate></md-spinner>
       <span class="md-title loading-text">Herp Derp...</span>
     </md-layout>
@@ -15,6 +16,9 @@
 </template>
 <script>
   import Tile from 'Tile.vue';
+import JsonRpc from './JsonRpc';
+
+  // const BASE_URL = 'ws://synhunter.mirkk.eu:1337';
 
   export default {
     data() {
@@ -33,15 +37,16 @@
     methods: {
       ping(i, j) {
         console.log('pinging...');
-        let payload = {
-          jsonrpc: "2.0",
-          method: 'foo',
-          params: [(i*parseInt(this.height)) + j],
-          id: 0
-        };
+        let payload = new JsonRpc('foo', 1, 0);
         console.log("sending payload", payload);
-        this.send(JSON.stringify(payload));
-        //this.socket.send(JSON.stringify(payload));
+        this.send(payload);
+        //this.socket.send(payload);
+      },
+      chooseTile() {
+        let apa = "4da2dae4-3982-482d-8e3d-42fd983ddaeb";
+        let payload = new JsonRpc('choose_tile', [apa], 2);
+        console.log("sending choose tile", payload);
+        this.send(payload);
       }
     },
     components: {Tile}
