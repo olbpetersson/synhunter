@@ -12,12 +12,31 @@
   text-align: center;
   padding: 8px 0;
 }
+.logo .logo-img {
+  height: 4.5em;
+}
 </style>
 </head>
 <body>
 <md-layout id="app" md-column>
   <md-whiteframe class="logo">
-    <span class="md-headline">Synhunter</span>
+    <md-layout>
+      <md-layout md-align="center" md-vertical-align="center">
+        <span class="md-headline">syn</span>
+      </md-layout>
+      <md-layout md-align="center" md-vertical-align="center" md-flex="5">
+        <span class="md-headline">•</span>
+      </md-layout>
+      <md-layout md-align="center" md-flex="20">
+        <img class="logo-img" src="/static/logo.png">
+      </md-layout>
+      <md-layout md-align="center" md-vertical-align="center" md-flex="5">
+        <span class="md-headline">•</span>
+      </md-layout>
+      <md-layout md-align="center" md-vertical-align="center">
+        <span class="md-headline">hunter</span>
+      </md-layout>
+    </md-layout>
   </md-whiteframe>
   <md-layout md-column md-flex>
     <md-layout md-flex>
