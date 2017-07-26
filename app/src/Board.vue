@@ -15,28 +15,34 @@
       <md-spinner md-indeterminate></md-spinner>
       <span class="md-title loading-text">Herp Derp...</span>
     </md-layout>
+    <md-layout v-if="currentPlayer && currentPlayer.isLeader">
+        <strong>You are the leader!</strong>
+        <div v-for="hint in gameState.turn.hints">
+            <span>hint</span>
+        </div>
+    </md-layout>
   </md-layout>
 </template>
 <script>
   import Tile from 'Tile.vue';
-import JsonRpc from './JsonRpc';
-
+  import JsonRpc from './JsonRpc';
+  import Player from 'Player'
   // const BASE_URL = 'ws://synhunter.mirkk.eu:1337';
 
   export default {
     data() {
       return {
-        currentPlayer: null,
+        currentPlayer: {},
         gameState: null,
         gameStateView: null
       };
     },
     props: ['width', 'height', 'send'],
-    created() {
+    mounted() {
       console.log('Board initialized', this.width, this.height);
 
       this.$on('game_state', (state) => {
-        console.log('updating our gamestate in the herpyderpyboard');
+        console.log('updating our gamestate in the herpyderpyboard', state);
         this.gameState = state;
         this.gameStateView = {};
         for (let tile of state.tiles) {
@@ -45,8 +51,13 @@ import JsonRpc from './JsonRpc';
           }
           this.gameStateView[tile.position[0]][tile.position[1]] = tile;
         }
+        this.updatePlayerState(this);
       });
-      this.$on('create_player', (e) => this.currentPlayer = e);
+      this.$on('create_player', (uuid) => {
+        this.currentPlayer.uuid = uuid;
+        console.log("asdf player", this.currentPlayer.uuid, uuid);
+        this.updatePlayerState(this);
+      });
     },
     methods: {
       ping(i, j) {
@@ -65,6 +76,23 @@ import JsonRpc from './JsonRpc';
         let payload = new JsonRpc('submit_hint', [bepa], 2);
         console.log("sending submit hint", payload);
         this.send(payload);
+      },
+      updatePlayerState(component){
+        if(component.currentPlayer && component.gameState){
+          component.gameState.teams.forEach(function (team) {
+            team.players.forEach(function (player) {
+              if (player.id === component.currentPlayer.uuid) {
+                component.currentPlayer.team = team.color;
+              }
+            });
+
+            if (team.leader === component.currentPlayer.uuid) {
+              component.currentPlayer.isLeader = true;
+              component.currentPlayer.team = team.color;
+            }
+          });
+        }
+        console.log("currentPlayer", component.currentPlayer);
       }
     },
     components: {Tile}
