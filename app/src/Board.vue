@@ -1,14 +1,9 @@
 <template>
 <div>
   <md-layout v-for="(row, i) in parseInt(height)" class="row">
-    <md-layout v-for="(tile, j) in parseInt(width)" md-gutter md-align="center">
+    <md-layout v-for="(tile, j) in parseInt(width)" class="tile" md-gutter>
       <md-card>
-        <md-card-actions>
-          <md-button @click="ping(i, j)">Ping</md-button>
-        </md-card-actions>
-        <md-card-content>
-          {{i}} {{j}}
-        </md-card-content>
+        <md-button @click="ping(i, j)">({{i}},{{j}})</md-button>
       </md-card>
     </md-layout>
   </md-layout>
@@ -48,6 +43,17 @@ export default {
 </script>
 <style>
 .row {
-  padding-top: 12px;
+  padding-top: 8px;
+}
+.tile {
+  min-width: 0;
+}
+.md-card {
+  width: 100%;
+  margin: 0 8px;
+}
+.md-card button {
+  min-width: 0;
+  margin: 0;
 }
 </style>
