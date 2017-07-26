@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::BufReader;
 use std::io::BufRead;
+use std::path::Path;
 
 use rand::{self, Rng};
 
@@ -9,9 +10,9 @@ pub struct Wordlist {
 }
 
 impl Wordlist {
-    pub fn new() -> Wordlist {
+    pub fn new<P: AsRef<Path>>(path: P) -> Wordlist {
         let mut words = vec![];
-        let f = File::open("../words/saoldict.txt").unwrap();
+        let f = File::open(path).unwrap();
         let file = BufReader::new(&f);
         for word in file.lines() {
             let word = word.unwrap()

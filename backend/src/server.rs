@@ -14,6 +14,9 @@ use structs::{Game, ClientState};
 use wordlist::Wordlist;
 use uuid::Uuid;
 
+const WORDLIST: &str = "../words/saoldict.txt";
+const EASY_WORDLIST: &str = "../words/easy_words.txt";
+
 build_rpc_trait! {
     pub trait GameApi {
         type Metadata;
@@ -59,15 +62,18 @@ struct GameServerState {
     game: Game,
     subscribers: HashMap<Uuid, pubsub::Sink<ClientState>>,
     wordlist: Wordlist,
+    easy_wordlist: Wordlist,
 }
 
 impl GameServerState {
     fn new() -> GameServerState {
-        let wordlist = Wordlist::new();
+        let wordlist = Wordlist::new(WORDLIST);
+        let easy_wordlist = Wordlist::new(EASY_WORDLIST);
         GameServerState {
-            game: Game::new(&wordlist),
+            game: Game::new(&easy_wordlist),
             subscribers: HashMap::new(),
             wordlist,
+            easy_wordlist,
         }
     }
 
@@ -85,7 +91,7 @@ impl GameServerState {
     }
 
     fn reset_game(&mut self) {
-        self.game = Game::new(&self.wordlist);
+        self.game = Game::new(&self.easy_wordlist);
         let players: Vec<Uuid> = self.subscribers.keys().cloned().collect();
         for player in players {
             self.game.board.add_player(player);
