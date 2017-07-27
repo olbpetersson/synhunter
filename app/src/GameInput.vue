@@ -1,12 +1,12 @@
 <template>
-<form novalidate @submit.stop.prevent="submit">
+<form novalidate @submit.stop.prevent="submit(), (value = '')">
   <md-layout class="container">
     <md-input-container :style="{color}">
       <label :style="{color}">{{label}}</label>
-      <md-input :disabled="false && !inputEnabled" v-model="value" :style="{color}"></md-input>
+      <md-input :disabled="!enabled" v-model="value" :style="{color}"></md-input>
     </md-input-container>
     <md-layout md-align="center">
-      <md-button :disabled="false && !inputEnabled" type="submit" class="md-raised" :style="{color}">
+      <md-button :disabled="!enabled" type="submit" class="md-raised" :style="{color}">
         <md-icon>send</md-icon>
         Submit
       </md-button>
@@ -20,11 +20,11 @@ export default {
   data() {
     return {
       value: null,
-      label: "Answer/Hint",
-      inputEnabled: false
+      // label: "Answer/Hint",
+      // inputEnabled: false
     };
   },
-  props: ['submit', 'color']
+  props: ['submit', 'color', 'enabled', 'label']
 };
 </script>
 <style scoped>

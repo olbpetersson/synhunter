@@ -5,7 +5,10 @@
       <md-layout md-column>
         <md-layout>isLeader: {{isLeader}}</md-layout>
         <template v-if="gameState">
-          <md-layout>team={{team}}</md-layout>
+          <span>Current team</span>
+          <md-layout>id={{team.id}}</md-layout>
+          <md-layout>color={{team.color}}</md-layout>
+          <md-layout>leader={{team.leader}}</md-layout>
           <span>Current turn</span>
           <md-layout>team: {{currentTurn.team}}</md-layout>
           <md-layout>hints: {{currentTurn.hints}}</md-layout>
@@ -21,17 +24,17 @@
             <span class="md-headline" v-show="isLeader">You are the leader!</span>
           </md-layout>
           <md-layout md-align="center">
-            <span class="md-headline" v-show=" currentTurn.team === team">Your teams turn!</span>
+            <span class="md-headline" v-show=" currentTurn.team === team.id">Your teams turn!</span>
           </md-layout>
         </md-layout>
       </div>
-      <md-layout v-show="!currentTurn.tile || currentTurn.team !== team">
+      <md-layout v-show="!currentTurn.tile || currentTurn.team !== team.id">
         <!-- show game board -->
         <md-layout md-column class="container">
           <md-layout v-for="row in gameStateView" key="row" class="row">
             <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
               <tile :tile="tile" :click="chooseTile"
-                  :enabled="currentTurn.team === team && isLeader"
+                  :enabled="currentTurn.team === team.id && isLeader"
                   :team="findTeam(tile.state)"></tile>
             </md-layout>
           </md-layout>
@@ -93,10 +96,10 @@
 
         this.gameStateView = {};
         for (let tile of state.tiles) {
-          if (!this.gameStateView[tile.position[0]]) {
-            this.gameStateView[tile.position[0]] = {};
+          if (!this.gameStateView[tile.position[1]]) {
+            this.gameStateView[tile.position[1]] = {};
           }
-          this.gameStateView[tile.position[0]][tile.position[1]] = tile;
+          this.gameStateView[tile.position[1]][tile.position[0]] = tile;
         }
         this.updatePlayerState();
         // if(this.gameState.turn.hints){
@@ -129,13 +132,13 @@
               if (uuid === this.player.uuid) {
                 this.$set(this.player, 'isLeader', false);
                 this.$set(this.player, 'team', team.color);
-                this.team = team.id;
+                this.team = team;
               }
             });
             if (team.leader === this.player.uuid) {
               this.$set(this.player, 'isLeader', true);
               this.$set(this.player, 'team', team.color);
-              this.team = team.id;
+              this.team = team;
             }
           });
         }

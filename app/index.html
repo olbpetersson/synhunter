@@ -46,7 +46,7 @@
     </md-layout>
     <md-whiteframe>
       <md-layout md-column>
-        <game-input ref="gameinput" :submit="submit" :color="color"></game-input>
+        <game-input ref="gameinput" :enabled="inputEnabled" :label="inputLabel" :submit="submit" :color="color"></game-input>
         <md-layout md-align="center">
           <md-button class="md-raised" @click="resetGame">
             <md-icon>refresh</md-icon>
