@@ -41,6 +41,7 @@ module.exports = [{
       'vue-material-css$': 'vue-material/dist/vue-material.css'
     }
   },
+  devtool: 'cheap-module-eval-source-map',
   devServer: {
     publicPath: '/dist/'
   }
