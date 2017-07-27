@@ -3,9 +3,9 @@
   <form novalidate @submit.stop.prevent="submit">
     <md-input-container>
       <label>{{label}}</label>
-      <md-input v-model="value"></md-input>
+      <md-input :disabled="!inputEnabled" v-model="value"></md-input>
     </md-input-container>
-    <md-button type="submit" class="md-raised">Submit</md-button>
+    <md-button :disabled="!inputEnabled" type="submit" class="md-raised">Submit {{inputEnabled}}</md-button>
   </form>
 </div>
 </template>
@@ -15,7 +15,8 @@ export default {
   data() {
     return {
       value: null,
-      label: 'Hint/Answer'
+      label: "Answer/Hint",
+      inputEnabled: false
     };
   },
   props: ['submit']

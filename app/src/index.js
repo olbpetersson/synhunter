@@ -17,13 +17,19 @@ const app = new Vue({
   data() {
     return {
       socket: null,
-      board: null
+      board: null,
+      gameInput: null
     }
   },
   watch: {
     'board.isLeader': function(isLeader) {
-      if (this.gameInput) {
-        this.gameInput.label = isLeader ? 'Leader' : 'Not leader';
+      if (this.gameInput && this.gameInput.inputEnabled) {
+        this.gameInput.label = isLeader ? 'Give an answer' : 'Give a synonym';
+      }
+    },
+    'board.gameState.turn': function(turn) {
+      if(this.gameInput) {
+        this.gameInput.inputEnabled = turn.tile ? true : false;
       }
     }
   },
@@ -32,23 +38,19 @@ const app = new Vue({
 
     this.socket = new WebSocket(BASE_URL);
     this.board = this.$refs.board;
-    this.gameInput = this.$refs.gameInput;
-
-    console.log("created board", this.board, this.gameInput);
+    this.gameInput = this.$refs.gameinput;
 
     this.socket.onopen = () => {
       let payload = new JsonRpc('game_subscribe', [], 1);
-      console.log("Sending gamesubscribe", payload);
       this.send(payload);
 
     };
 
     this.socket.onmessage = (e) => {
       let response = JSON.parse(e.data);
-      console.log("RESPONSUSUSUSUSU", response);
       if (response.method) {
         let gameState = new GameBoard(response.params.result.turn, response.params.result.board.teams, response.params.result.board.tiles);
-        console.log("Subscribed to asdf", gameState);
+        console.log("Subscribed to game", gameState);
         this.board.$emit('game_state', gameState);
       } else if (response.result) {
         let uuid = response.result;
@@ -59,20 +61,19 @@ const app = new Vue({
     this.socket.onerror = (e) => console.log("Got a websocket error", e);
 
     this.$on('send', (e) => {
-      console.log('sending from index', e);
       this.socket.send(JSON.stringify(e));
     });
   },
   methods : {
     send(e) {
+      console.log("Sending via websocket: ", e);
       this.socket.send(JSON.stringify(e));
     },
     submit() {
       let method = this.board.isLeader ? "submit_answer" : "submit_hint";
-      let payload = new JsonRpc(method, [this.value],999);
-      console.log("sending submit answer", this.value);
+      console.log("sending with method name and value", method, this.gameInput.value);
+      let payload = new JsonRpc(method, [this.gameInput.value],999);
       this.send(payload);
-      console.log("is leader inna da gameinput", this.board.isLeader);
     }
   }
 });

@@ -42,8 +42,8 @@
     <md-layout md-flex>
       <board ref="board" :send="send" width="5" height="5"></board>
     </md-layout>
-    <md-whiteframe v-if="board && board.currentPlayer">
-      <game-input ref="gameInput" :submit="submit"></game-input>
+    <md-whiteframe >
+      <game-input ref="gameinput" :submit="submit"></game-input>
     </md-whiteframe>
   </md-layout>
 </md-layout>
