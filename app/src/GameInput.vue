@@ -7,8 +7,8 @@
     </md-input-container>
     <md-layout md-align="center">
       <md-button :disabled="false && !inputEnabled" type="submit" class="md-raised" :style="{color}">
-        Submit
         <md-icon>send</md-icon>
+        Submit
       </md-button>
     </md-layout>
   </md-layout>

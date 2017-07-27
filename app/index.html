@@ -45,12 +45,16 @@
       <board ref="board" :send="send" width="5" height="5"></board>
     </md-layout>
     <md-whiteframe>
-      <game-input ref="gameinput" :submit="submit" :color="color"></game-input>
+      <md-layout md-column>
+        <game-input ref="gameinput" :submit="submit" :color="color"></game-input>
+        <md-layout md-align="center">
+          <md-button class="md-raised" @click="resetGame">
+            <md-icon>refresh</md-icon>
+            Reset game
+          </md-button>
+        </md-layout>
+      </md-layout>
     </md-whiteframe>
-    <md-whiteframe style="text-align: center">
-      <md-button class="md-raised" @click="resetGame"  >Reset the game</md-button>
-    </md-whiteframe>
-
   </md-layout>
 </md-layout>
 <script src="/dist/index.bundle.js"></script>

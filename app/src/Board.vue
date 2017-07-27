@@ -1,22 +1,34 @@
 <template>
-  <md-layout>
-    <md-layout md-column v-if="currentPlayer && gameStateView">
-      <md-layout md-align="center" v-if="currentPlayer.isLeader">
-        <span class="md-headline">You are the leader!</span>
+  <md-layout md-column>
+
+
+    <div>
+      <md-layout md-column>
+        <md-layout>isLeader: {{isLeader}}</md-layout>
+        <md-layout>myTurn: {{myTurn}}</md-layout>
       </md-layout>
-      <md-layout v-if="!gameState.turn.tile">
+    </div>
+
+    <md-layout md-column v-if="currentPlayer && gameStateView">
+      <div v-show="isLeader || myTurn">
+        <md-layout md-align="center">
+          <span class="md-headline" v-show="isLeader">You are the leader!</span>
+          <span class="md-headline" v-show="myTurn">Your teams turn!</span>
+        </md-layout>
+      </div>
+      <md-layout v-show="!gameState.turn.tile || !myTurn">
         <!-- show game board -->
         <md-layout md-column class="container">
           <md-layout v-for="row in gameStateView" key="row" class="row">
             <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
-              <tile :tile="tile" :click="chooseTile" :enabled="currentPlayer.isLeader"></tile>
+              <tile :tile="tile" :click="chooseTile" :enabled="isLeader"></tile>
             </md-layout>
           </md-layout>
         </md-layout>
       </md-layout>
-      <md-layout v-else>
+      <md-layout v-show="gameState.turn.tile && myTurn">
         <!-- !isLeader: show input -->
-        <md-layout md-column class="container" v-if="!currentPlayer.isLeader">
+        <md-layout md-column class="container" v-if="!isLeader">
             Give a synonym for: {{ findTileWord(gameState.turn.tile) }}
         </md-layout>
         <!-- isLeader: show hints -->
@@ -43,12 +55,16 @@
   export default {
     data() {
       return {
+        currentTeamId: null,
         currentPlayer: {},
         gameState: null,
         gameStateView: null
       };
     },
     computed: {
+      myTurn() {
+        return this.gameState && this.gameState.turn.team === this.currentTeamId;
+      },
       isLeader() {
         return this.currentPlayer && this.currentPlayer.isLeader;
       },
@@ -101,6 +117,7 @@
               if (uuid === this.currentPlayer.uuid) {
                 this.$set(this.currentPlayer, 'isLeader', false);
                 this.$set(this.currentPlayer, 'team', team.color);
+                this.currentTeamId = team.id;
               }
             });
             if (team.leader === this.currentPlayer.uuid) {
@@ -111,7 +128,8 @@
         }
       },
       findTileWord(uuid) {
-        return this.gameState.tiles.find((tile) => tile.id === uuid).word;
+        let tile = this.gameState.tiles.find((tile) => tile.id === uuid);
+        return tile ? tile.word : null;
       }
     },
     components: {Tile}
