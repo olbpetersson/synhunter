@@ -1,7 +1,7 @@
 export default class GameBoard {
-  constructor(turn, teams, tiles) {
-    this.turn = turn;
+  constructor(teams, tiles, turns) {
     this.teams = teams;
     this.tiles = tiles;
+    this.turns = turns;
   }
 }

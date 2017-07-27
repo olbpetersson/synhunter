@@ -1,41 +1,51 @@
 <template>
   <md-layout md-column>
 
-
     <div>
       <md-layout md-column>
         <md-layout>isLeader: {{isLeader}}</md-layout>
-        <md-layout>myTurn: {{myTurn}}</md-layout>
+        <template v-if="gameState">
+          <md-layout>team={{team}}</md-layout>
+          <span>Current turn</span>
+          <md-layout>team: {{currentTurn.team}}</md-layout>
+          <md-layout>hints: {{currentTurn.hints}}</md-layout>
+          <md-layout>tile: {{currentTurn.tile}}</md-layout>
+        </template>
       </md-layout>
     </div>
 
-    <md-layout md-column v-if="currentPlayer && gameStateView">
-      <div v-show="isLeader || myTurn">
-        <md-layout md-align="center">
-          <span class="md-headline" v-show="isLeader">You are the leader!</span>
-          <span class="md-headline" v-show="myTurn">Your teams turn!</span>
+    <md-layout md-column v-if="player && gameStateView">
+      <div v-show="isLeader || currentTurn.team === team">
+        <md-layout md-column>
+          <md-layout md-align="center">
+            <span class="md-headline" v-show="isLeader">You are the leader!</span>
+          </md-layout>
+          <md-layout md-align="center">
+            <span class="md-headline" v-show=" currentTurn.team === team">Your teams turn!</span>
+          </md-layout>
         </md-layout>
       </div>
-      <md-layout v-show="!gameState.turn.tile || !myTurn">
+      <md-layout v-show="!currentTurn.tile || currentTurn.team !== team">
         <!-- show game board -->
         <md-layout md-column class="container">
           <md-layout v-for="row in gameStateView" key="row" class="row">
             <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
-              <tile :tile="tile" :click="chooseTile" :enabled="isLeader"></tile>
+              <tile :tile="tile" :click="chooseTile"
+                  :enabled="currentTurn.team === team && isLeader"
+                  :team="findTeam(tile.state)"></tile>
             </md-layout>
           </md-layout>
         </md-layout>
       </md-layout>
-      <md-layout v-show="gameState.turn.tile && myTurn">
+      <md-layout v-show="currentTurn.tile && currentTurn.team === team">
         <!-- !isLeader: show input -->
-        <md-layout md-column class="container" v-if="!isLeader">
-            Give a synonym for: {{ findTileWord(gameState.turn.tile) }}
+        <md-layout md-column class="container" v-show="!isLeader">
+            Give a synonym for: {{ findTileWord(currentTurn.tile) }}
         </md-layout>
         <!-- isLeader: show hints -->
-        <md-layout md-column class="container" v-else>
-          {{gameState.turn.hints}}
-          <md-layout v-for="hint in gameState.turn.hints" key="row" class="column">
-            a hint!  {{hint}}
+        <md-layout md-column class="container" v-show="isLeader">
+          <md-layout v-for="hint in currentTurn.hints" key="hint">
+            <span>Hint: {{hint}}</span>
           </md-layout>
         </md-layout>
       </md-layout>
@@ -55,29 +65,31 @@
   export default {
     data() {
       return {
-        currentTeamId: null,
-        currentPlayer: {},
+        team: null,
+        player: {},
         gameState: null,
         gameStateView: null
       };
     },
     computed: {
-      myTurn() {
-        return this.gameState && this.gameState.turn.team === this.currentTeamId;
+      currentTurn() {
+        return this.gameState ? this.gameState.turns[this.gameState.turns.length - 1] : null;
       },
       isLeader() {
-        return this.currentPlayer && this.currentPlayer.isLeader;
+        return this.player ? this.player.isLeader : false;
       },
       hasSelectedTile() {
-        this.gameState ? this.gameState.turn.tile : undefined;
+        const turn = this.currentTurn;
+        return  turn ? turn.tile : false;
       }
     },
     props: ['width', 'height', 'send'],
     mounted() {
       this.$on('game_state', (state) => {
 
-        this.$set(this, 'gameState', state);
-        this.$set(this.gameState, 'turn', state.turn);
+        this.gameState = state;
+        // this.$set(this, 'gameState', state);
+        // this.$set(this.gameState, 'turn', state.turn);
 
         this.gameStateView = {};
         for (let tile of state.tiles) {
@@ -87,12 +99,12 @@
           this.gameStateView[tile.position[0]][tile.position[1]] = tile;
         }
         this.updatePlayerState();
-        if(this.gameState.turn.hints){
-          this.$set(this.gameState.turn, 'hints', state.turn.hints);
-        }
+        // if(this.gameState.turn.hints){
+        //   this.$set(this.gameState.turn, 'hints', state.turn.hints);
+        // }
       });
       this.$on('create_player', (uuid) => {
-        this.currentPlayer.uuid = uuid;
+        this.player.uuid = uuid;
         this.updatePlayerState();
       });
     },
@@ -111,21 +123,25 @@
         this.send(payload);
       },
       updatePlayerState() {
-        if(this.currentPlayer && this.gameState){
+        if(this.player && this.gameState){
           this.gameState.teams.forEach((team) => {
             team.players.forEach((uuid) => {
-              if (uuid === this.currentPlayer.uuid) {
-                this.$set(this.currentPlayer, 'isLeader', false);
-                this.$set(this.currentPlayer, 'team', team.color);
-                this.currentTeamId = team.id;
+              if (uuid === this.player.uuid) {
+                this.$set(this.player, 'isLeader', false);
+                this.$set(this.player, 'team', team.color);
+                this.team = team.id;
               }
             });
-            if (team.leader === this.currentPlayer.uuid) {
-              this.$set(this.currentPlayer, 'isLeader', true);
-              this.$set(this.currentPlayer, 'team', team.color);
+            if (team.leader === this.player.uuid) {
+              this.$set(this.player, 'isLeader', true);
+              this.$set(this.player, 'team', team.color);
+              this.team = team.id;
             }
           });
         }
+      },
+      findTeam(id) {
+        return this.gameState.teams.find(team => team.id === id);
       },
       findTileWord(uuid) {
         let tile = this.gameState.tiles.find((tile) => tile.id === uuid);

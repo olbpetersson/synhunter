@@ -28,12 +28,12 @@ const app = new Vue({
         this.gameInput.label = isLeader ? 'Give an answer' : 'Give a synonym';
       }
     },
-    'board.gameState.turn': function(turn) {
+    'board.currentTurn': function(turn) {
       if(this.gameInput) {
-        this.gameInput.inputEnabled = turn.tile ? true : false;
+        this.gameInput.inputEnabled = turn && turn.tile ? true : false;
       }
     },
-    'board.currentPlayer.team': function(color) {
+    'board.player.team': function(color) {
       this.updateColor();
     }
   },
@@ -48,13 +48,14 @@ const app = new Vue({
     this.socket.onopen = () => {
       let payload = new JsonRpc('game_subscribe', [], 1);
       this.send(payload);
-
     };
 
     this.socket.onmessage = (e) => {
       let response = JSON.parse(e.data);
       if (response.method) {
-        let gameState = new GameBoard(response.params.result.turn, response.params.result.board.teams, response.params.result.board.tiles);
+        let gameState = new GameBoard(response.params.result.board.teams,
+                                      response.params.result.board.tiles,
+                                      response.params.result.turns);
         console.log("Subscribed to game", gameState);
         this.board.$emit('game_state', gameState);
       } else if (response.result) {
@@ -81,10 +82,10 @@ const app = new Vue({
       this.send(payload);
     },
     updateColor() {
-      if (!this.board.currentPlayer || !this.board.gameState) {
+      if (!this.board.player || !this.board.gameState) {
         return;
       }
-      const uuid = this.board.currentPlayer.uuid;
+      const uuid = this.board.player.uuid;
       for (let team of this.board.gameState.teams) {
         if (team.leader === uuid) {
           this.color = team.color;
