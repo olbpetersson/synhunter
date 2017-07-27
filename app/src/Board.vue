@@ -13,33 +13,42 @@
           <md-layout>team: {{currentTurn.team}}</md-layout>
           <md-layout>hints: {{currentTurn.hints}}</md-layout>
           <md-layout>tile: {{currentTurn.tile}}</md-layout>
+          <span>Guesses</span>
+          <md-layout>pending: {{pendingGuess}}</md-layout>
+          <md-layout>guess: {{guess}}</md-layout>
         </template>
       </md-layout>
     </div>
 
     <md-layout md-column v-if="player && gameStateView">
-      <div v-show="isLeader || currentTurn.team === team.id">
-        <md-layout md-column>
-          <md-layout md-align="center" v-show="isLeader">
-            <span class="md-headline">You are the leader!</span>
-          </md-layout>
-          <!-- hints -->
-          <md-layout md-column class="container" v-show="currentTurn.team === team.id && isLeader">
-            <md-layout v-for="hint in currentTurn.hints" key="hint">
-              <span>Hint: {{hint}}</span>
+
+      <!-- leader -->
+      <div class="status-field">
+        <div v-show="isLeader">
+          <md-layout md-column>
+            <md-layout md-align="center">
+              <span class="md-headline">You are the leader!</span>
+            </md-layout>
+            <md-layout md-column class="container" v-show="currentTurn.team === team.id">
+              <md-layout v-for="hint in currentTurn.hints" key="hint">
+                <span>Hint: {{hint}}</span>
+              </md-layout>
             </md-layout>
           </md-layout>
-
-          <md-layout md-align="center" v-show=" currentTurn.team === team.id">
+        </div>
+        <!-- turn -->
+        <div v-show="currentTurn.team === team.id">
+          <md-layout md-align="center">
             <span class="md-headline">Your teams turn!</span>
           </md-layout>
-        </md-layout>
+        </div>
+        <!-- status -->
+        <div v-if="status">
+          <md-layout md-align="center">
+            <span class="md-headline">{{status}}</span>
+          </md-layout>
+        </div>
       </div>
-      
-      <!-- <md-layout v-show="!currentTurn.tile || currentTurn.team !== team.id"> -->
-
-      
-
       <!-- game board -->
       <md-layout md-column class="container">
         <md-layout v-for="row in gameStateView" key="row" class="row">
@@ -54,22 +63,11 @@
           </md-layout>
         </md-layout>
       </md-layout>
-
-      <!-- </md-layout>
-      <md-layout v-show="currentTurn.tile && currentTurn.team === team"> -->
-        
-      <!-- !isLeader: show input -->
-      <!-- <md-layout md-column class="container" v-show="!isLeader">
-          Give a synonym for: {{ findTileWord(currentTurn.tile) }}
-      </md-layout> -->
-      
-      <!-- </md-layout> -->
-
     </md-layout>
 
     <md-layout md-column md-align="center" md-vertical-align="center" v-else>
       <md-spinner md-indeterminate></md-spinner>
-      <span class="md-title loading-text">Herp Derp...</span>
+      <span class="md-title loading-text">Waiting for game...</span>
     </md-layout>
   </md-layout>
 </template>
@@ -82,8 +80,11 @@
   export default {
     data() {
       return {
+        status: null,
         team: null,
         player: {},
+        pendingGuess: null,
+        guess: null,
         gameState: null,
         gameStateView: null
       };
@@ -103,12 +104,20 @@
     props: ['width', 'height', 'send', 'debug'],
     mounted() {
       this.$on('game_state', (state) => {
-
         this.gameState = state;
         if (this.currentTurn.spyhint &&
             !this.currentTurn.hints.find(hint => hint === this.currentTurn.spyhint)) {
           let index = Math.floor(Math.random() * this.currentTurn.hints.length);
           this.currentTurn.hints.splice(index, 0, this.currentTurn.spyhint);
+        }
+        if (this.pendingGuess) {
+          if (this.currentTurn.hints.find(hint => hint === this.pendingGuess)) {
+            this.guess = this.pendingGuess;
+          } else {
+            this.status = 'Word rejected, try again!';
+            setTimeout(() => (this.status = null), 2000);
+          }
+          this.pendingGuess = null;
         }
         this.gameStateView = {};
         for (let tile of state.tiles) {
@@ -178,6 +187,14 @@
 <style scoped>
   .loading-text {
     margin-top: 12px;
+  }
+  .status-field {
+    background: rgba(0,0,0,0.4);
+    color: white;
+    width: 100%;
+    margin-bottom: -24px;
+    padding: 12px 0;
+    z-index: 10;
   }
   .container {
     margin-bottom: 8px;

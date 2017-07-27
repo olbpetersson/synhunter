@@ -24,24 +24,21 @@ const app = new Vue({
   },
   computed: {
     inputEnabled() {
-      if (!this.board || !this.board.gameState) {
+      if (!this.board || !this.board.gameState || this.board.pendingGuess || this.board.guess) {
         return false;
       }
       return this.board.currentTurn.tile &&
              this.board.currentTurn.team === this.board.team.id;
     },
     inputSpyEnabled() {
-      if (!this.board || !this.board.gameState) {
+      if (!this.board || !this.board.gameState || this.board.pendingGuess || this.board.guess) {
         return false;
       }
       return this.board.currentTurn.tile && !this.board.isLeader &&
              this.board.currentTurn.team !== this.board.team.id;
     },
     inputLabel() {
-      if (!this.board || !this.board.gameState) {
-        return false;
-      }
-      return this.board.isLeader ? 'Give an answer' : 'Give a synonym';
+      return this.board && this.board.isLeader ? 'Give an answer' : 'Give a synonym';
     },
     color() {
       return this.board && this.board.gameState ? this.board.team.color : 'transparent';
@@ -86,6 +83,10 @@ const app = new Vue({
       this.socket.send(JSON.stringify(e));
     },
     submit() {
+      if (this.board.pendingGuess || this.board.guess) {
+        return;
+      }
+      this.board.pendingGuess = this.gameInput.value;
       let method = this.board.isLeader ? "submit_answer" : "submit_hint";
       console.log("sending with method name and value", method, this.gameInput.value);
       let payload = new JsonRpc(method, [this.gameInput.value],999);
