@@ -19,6 +19,6 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --hot",
-    "build": "webpack"
+    "build": "webpack -p"
   }
 }
