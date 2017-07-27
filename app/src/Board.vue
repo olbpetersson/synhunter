@@ -100,7 +100,7 @@
         return  turn ? turn.tile : false;
       }
     },
-    props: ['width', 'height', 'send'],
+    props: ['width', 'height', 'send', 'debug'],
     mounted() {
       this.$on('game_state', (state) => {
 

@@ -18,7 +18,8 @@ const app = new Vue({
     return {
       socket: null,
       board: null,
-      gameInput: null
+      gameInput: null,
+      debug: false
     }
   },
   computed: {

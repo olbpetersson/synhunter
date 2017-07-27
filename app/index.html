@@ -29,7 +29,7 @@
         <span class="md-headline">•</span>
       </md-layout>
       <md-layout md-align="center" md-flex="20">
-        <img class="logo-img" src="/static/logo.png">
+        <img class="logo-img" src="/static/logo.png" @click="debug = !debug">
       </md-layout>
       <md-layout md-align="center" md-vertical-align="center" md-flex="5">
         <span class="md-headline">•</span>
@@ -42,7 +42,7 @@
   <md-progress md-progress.number="100" :style="{'background-color': color}"></md-progress>
   <md-layout md-column md-flex>
     <md-layout md-flex>
-      <board ref="board" :send="send" width="5" height="5"></board>
+      <board ref="board" :send="send" width="5" height="5" :debug="debug"></board>
     </md-layout>
     <md-whiteframe>
       <md-layout md-column>
