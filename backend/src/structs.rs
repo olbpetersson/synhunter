@@ -43,8 +43,8 @@ impl Game {
         let turn = self.turns.last_mut().unwrap();
         if let Some(tile_id) = turn.tile {
             if let Some(tile) = self.board.get_tile(tile_id) {
-                if tile.word == hint {
-                    println!("submit_hint: Hint same as word. Not allowed!!!");
+                if hint.contains(&tile.word) || tile.word.contains(&hint) {
+                    println!("submit_hint: Hint same as, or a subset of the word");
                     return;
                 }
             } else {
