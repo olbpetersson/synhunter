@@ -1,7 +1,7 @@
 <template>
   <md-layout md-column>
 
-    <div>
+    <div v-show="debug">
       <md-layout md-column>
         <md-layout>isLeader: {{isLeader}}</md-layout>
         <template v-if="gameState">
@@ -18,42 +18,55 @@
     </div>
 
     <md-layout md-column v-if="player && gameStateView">
-      <div v-show="isLeader || currentTurn.team === team">
+      <div v-show="isLeader || currentTurn.team === team.id">
         <md-layout md-column>
-          <md-layout md-align="center">
-            <span class="md-headline" v-show="isLeader">You are the leader!</span>
+          <md-layout md-align="center" v-show="isLeader">
+            <span class="md-headline">You are the leader!</span>
           </md-layout>
-          <md-layout md-align="center">
-            <span class="md-headline" v-show=" currentTurn.team === team.id">Your teams turn!</span>
+          <!-- hints -->
+          <md-layout md-column class="container" v-show="currentTurn.team === team.id && isLeader">
+            <md-layout v-for="hint in currentTurn.hints" key="hint">
+              <span>Hint: {{hint}}</span>
+            </md-layout>
+          </md-layout>
+
+          <md-layout md-align="center" v-show=" currentTurn.team === team.id">
+            <span class="md-headline">Your teams turn!</span>
           </md-layout>
         </md-layout>
       </div>
-      <md-layout v-show="!currentTurn.tile || currentTurn.team !== team.id">
-        <!-- show game board -->
-        <md-layout md-column class="container">
-          <md-layout v-for="row in gameStateView" key="row" class="row">
-            <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
-              <tile :is-selected="isSelectedTile(tile.id)" :tile="tile" :click="chooseTile"
-                    :show-word="isSelectedTile(tile.id) && !isLeader && currentTurn.team === team.id"
-                  :enabled="currentTurn.team === team.id && isLeader"
-                  :team="findTeam(tile.state)"></tile>
-            </md-layout>
+      
+      <!-- <md-layout v-show="!currentTurn.tile || currentTurn.team !== team.id"> -->
+
+      
+
+      <!-- game board -->
+      <md-layout md-column class="container">
+        <md-layout v-for="row in gameStateView" key="row" class="row">
+          <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
+            <tile
+                :tile="tile"
+                :click="chooseTile"
+                :claimedByTeam="findTeam(tile.state)"
+                :isSelected="currentTurn.tile === tile.id"
+                :myTeam="currentTurn.team === team.id"
+                :showWord="!isLeader"></tile>
           </md-layout>
         </md-layout>
       </md-layout>
-      <md-layout v-show="currentTurn.tile && currentTurn.team === team">
-        <!-- !isLeader: show input -->
-        <md-layout md-column class="container" v-show="!isLeader">
-            Give a synonym for: {{ findTileWord(currentTurn.tile) }}
-        </md-layout>
-        <!-- isLeader: show hints -->
-        <md-layout md-column class="container" v-show="isLeader">
-          <md-layout v-for="hint in currentTurn.hints" key="hint">
-            <span>Hint: {{hint}}</span>
-          </md-layout>
-        </md-layout>
-      </md-layout>
+
+      <!-- </md-layout>
+      <md-layout v-show="currentTurn.tile && currentTurn.team === team"> -->
+        
+      <!-- !isLeader: show input -->
+      <!-- <md-layout md-column class="container" v-show="!isLeader">
+          Give a synonym for: {{ findTileWord(currentTurn.tile) }}
+      </md-layout> -->
+      
+      <!-- </md-layout> -->
+
     </md-layout>
+
     <md-layout md-column md-align="center" md-vertical-align="center" v-else>
       <md-spinner md-indeterminate></md-spinner>
       <span class="md-title loading-text">Herp Derp...</span>
@@ -92,11 +105,10 @@
       this.$on('game_state', (state) => {
 
         this.gameState = state;
-        // this.$set(this, 'gameState', state);
-        // this.$set(this.gameState, 'turn', state.turn);
-        if(this.currentTurn.spyhint && this.currentTurn.hints) {
-            index = Math.floor(Math.random() * turn.hints.length);
-            this.currentTurn.hints.splice(index, 0, this.currentTurn.spyhint)
+        if (this.currentTurn.spyhint &&
+            !this.currentTurn.hints.find(hint => hint === this.currentTurn.spyhint)) {
+          let index = Math.floor(Math.random() * this.currentTurn.hints.length);
+          this.currentTurn.hints.splice(index, 0, this.currentTurn.spyhint);
         }
         this.gameStateView = {};
         for (let tile of state.tiles) {
@@ -106,9 +118,6 @@
           this.gameStateView[tile.position[1]][tile.position[0]] = tile;
         }
         this.updatePlayerState();
-        // if(this.gameState.turn.hints){
-        //   this.$set(this.gameState.turn, 'hints', state.turn.hints);
-        // }
       });
       this.$on('create_player', (uuid) => {
         this.player.uuid = uuid;

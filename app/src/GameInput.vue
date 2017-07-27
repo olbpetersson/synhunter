@@ -1,15 +1,23 @@
 <template>
 <form novalidate @submit.stop.prevent="submit(), (value = '')">
-  <md-layout class="container">
+  <md-layout class="container" v-show="enabled">
     <md-input-container :style="{color}">
       <label :style="{color}">{{label}}</label>
-      <md-input :disabled="!enabled" v-model="value" :style="{color}"></md-input>
+      <md-input v-model="value" :style="{color}"></md-input>
     </md-input-container>
     <md-layout md-align="center">
-      <md-button :disabled="!enabled" type="submit" class="md-raised" :style="{color}">
+      <md-button type="submit" class="md-raised" :style="{color}">
         <md-icon>send</md-icon>
         Submit
       </md-button>
+    </md-layout>
+  </md-layout>
+  <md-layout md-column v-show="!enabled">
+    <md-layout md-align="center">
+      <md-spinner md-indeterminate></md-spinner>
+    </md-layout>
+    <md-layout md-align="center">
+      <span>Waiting...</span>
     </md-layout>
   </md-layout>
 </form>
@@ -19,9 +27,7 @@ import JsonRpc from 'JsonRpc'
 export default {
   data() {
     return {
-      value: null,
-      // label: "Answer/Hint",
-      // inputEnabled: false
+      value: null
     };
   },
   props: ['submit', 'color', 'enabled', 'label']
