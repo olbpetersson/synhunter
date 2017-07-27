@@ -1,28 +1,24 @@
 <template>
   <md-card>
-    <md-button class="foobar" @click="click(tile.id)" v-if="!tile.state">{{tile.word}}</md-button>
-    <img class="card-logo" v-else src="/static/logo.png">
+    <md-button @click="click(tile.id)" :disabled="!enabled">{{enabled ? 'enabled' : 'disabled'}}</md-button>
   </md-card>
 </template>
 <script>
   export default {
-    data() {
-      return {};
-    },
-    props: ['tile', 'click'],
-    methods: {
-      foo() {
-        // console.log(this.id, this.word);
-      }
-    }
+    props: ['tile', 'click', 'enabled']
   };
 </script>
 <style scoped>
-  /*.container {
-    padding: 8px;
-  }*/
-  .foobar {
+  .md-card {
+    background-image: url(/static/logo.png);
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .md-button {
     min-width: 0;
+    height: 100%;
+    margin: 0;
     padding: 0;
   }
   .card-logo {

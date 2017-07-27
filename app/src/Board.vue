@@ -1,27 +1,31 @@
 <template>
   <md-layout>
-    <md-layout md-column v-if="gameStateView">
-      <div v-if="currentPlayer && currentPlayer.isLeader && !gameState.turn.tile">
-        <md-layout md-align="center">
-          <span class="md-headline">You are the leader!</span>
-        </md-layout>
-      </div>
-      <md-layout md-column class="container" v-if="gameStateView && !gameState.turn.tile">
-        <md-layout v-for="row in gameStateView" key="row" class="row">
-          <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
-            <tile :tile="tile" :click="chooseTile"></tile>
+    <md-layout md-column v-if="currentPlayer && gameStateView">
+      <md-layout md-align="center" v-if="currentPlayer.isLeader">
+        <span class="md-headline">You are the leader!</span>
+      </md-layout>
+      <md-layout v-if="!gameState.turn.tile">
+        <!-- show game board -->
+        <md-layout md-column class="container">
+          <md-layout v-for="row in gameStateView" key="row" class="row">
+            <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
+              <tile :tile="tile" :click="chooseTile" :enabled="currentPlayer.isLeader"></tile>
+            </md-layout>
           </md-layout>
         </md-layout>
       </md-layout>
-      <md-layout md-column class="container" v-if="currentPlayer && currentPlayer.isLeader && gameState.turn.tile ">
+      <md-layout v-else>
+        <!-- !isLeader: show input -->
+        <md-layout md-column class="container" v-if="!currentPlayer.isLeader">
+            Give a synonym for: {{ findTileWord(gameState.turn.tile) }}
+        </md-layout>
+        <!-- isLeader: show hints -->
+        <md-layout md-column class="container" v-else>
           {{gameState.turn.hints}}
           <md-layout v-for="hint in gameState.turn.hints" key="row" class="column">
-              a hint!  {{hint}}
+            a hint!  {{hint}}
           </md-layout>
-      </md-layout>
-      -------
-      <md-layout md-column class="container" v-if="currentPlayer && !currentPlayer.isLeader && gameState.turn.tile ">
-          Give a synonym for: {{ findTileWord(gameState.turn.tile) }}
+        </md-layout>
       </md-layout>
     </md-layout>
     <md-layout md-column md-align="center" md-vertical-align="center" v-else>
@@ -45,10 +49,10 @@
       };
     },
     computed: {
-      isLeader: function() {
+      isLeader() {
         return this.currentPlayer && this.currentPlayer.isLeader;
       },
-      hasSelectedTile: function() {
+      hasSelectedTile() {
         this.gameState ? this.gameState.turn.tile : undefined;
       }
     },
@@ -59,7 +63,6 @@
         this.$set(this, 'gameState', state);
         this.$set(this.gameState, 'turn', state.turn);
 
-//        this.$set(this.gameState.turn, 'tile', state.turn.tile);
         this.gameStateView = {};
         for (let tile of state.tiles) {
           if (!this.gameStateView[tile.position[0]]) {

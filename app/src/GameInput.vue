@@ -3,10 +3,10 @@
   <md-layout class="container">
     <md-input-container :style="{color}">
       <label :style="{color}">{{label}}</label>
-      <md-input :disabled="!inputEnabled" v-model="value" :style="{color}"></md-input>
+      <md-input :disabled="false && !inputEnabled" v-model="value" :style="{color}"></md-input>
     </md-input-container>
     <md-layout md-align="center">
-      <md-button :disabled="!inputEnabled" type="submit" class="md-raised" :style="{color}">
+      <md-button :disabled="false && !inputEnabled" type="submit" class="md-raised" :style="{color}">
         Submit
         <md-icon>send</md-icon>
       </md-button>
