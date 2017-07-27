@@ -94,7 +94,10 @@
         this.gameState = state;
         // this.$set(this, 'gameState', state);
         // this.$set(this.gameState, 'turn', state.turn);
-
+        if(this.currentTurn.spyhint && this.currentTurn.hints) {
+            index = Math.floor(Math.random() * turn.hints.length);
+            this.currentTurn.hints.splice(index, 0, this.currentTurn.spyhint)
+        }
         this.gameStateView = {};
         for (let tile of state.tiles) {
           if (!this.gameStateView[tile.position[1]]) {
