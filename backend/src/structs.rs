@@ -10,7 +10,7 @@ pub type TeamRef = Uuid;
 #[derive(Debug)]
 pub struct Game {
     pub board: Board,
-    pub turn: Turn,
+    pub turns: Vec<Turn>,
 }
 
 impl Game {
@@ -19,19 +19,20 @@ impl Game {
         let turn = Turn::new(board.teams[0].id);
         Game {
             board,
-            turn,
+            turns: vec![turn],
         }
     }
 
     pub fn choose_tile(&mut self, player: PlayerRef, tile: Uuid) {
-        if self.turn.tile.is_some() {
+        let turn = self.turns.last_mut().unwrap();
+        if turn.tile.is_some() {
             println!("choose_tile: Tile already set");
             return;
         }
-        if let Some(team) = self.board.get_team(self.turn.team) {
+        if let Some(team) = self.board.get_team(turn.team) {
             if team.leader == Some(player) {
                 println!("Choosing tile {}", tile);
-                self.turn.tile = Some(tile);
+                turn.tile = Some(tile);
             } else {
                 println!("choose_tile: Not correct leader");
             }
@@ -39,7 +40,8 @@ impl Game {
     }
 
     pub fn submit_hint(&mut self, player: PlayerRef, hint: String) {
-        if let Some(tile_id) = self.turn.tile {
+        let turn = self.turns.last_mut().unwrap();
+        if let Some(tile_id) = turn.tile {
             if let Some(tile) = self.board.get_tile(tile_id) {
                 if tile.word == hint {
                     println!("submit_hint: Hint same as word. Not allowed!!!");
@@ -48,17 +50,17 @@ impl Game {
             } else {
                 println!("submit_hint: No valid tile in turn");
             }
-            if let Some(team) = self.board.get_team(self.turn.team) {
+            if let Some(team) = self.board.get_team(turn.team) {
                 if team.has_player_not_leader(player) {
-                    if self.turn.hints.contains_key(&player) {
+                    if turn.hints.contains_key(&player) {
                         println!("submit_hint: Player not in active team");
                         return;
                     }
                     println!("Player {} added hint {}", player, hint);
-                    self.turn.hints.insert(player, hint);
-                } else if self.turn.spyhint.is_none() {
+                    turn.hints.insert(player, hint);
+                } else if turn.spyhint.is_none() {
                     println!("submit_hint: Setting spyhint to {}", hint);
-                    self.turn.spyhint = Some(hint);
+                    turn.spyhint = Some(hint);
                 }
             }
         } else {
@@ -68,24 +70,25 @@ impl Game {
     }
 
     pub fn submit_answer(&mut self, player: PlayerRef, answer: String) {
-        if let Some(team) = self.board.get_team(self.turn.team) {
+        if let Some(team) = self.board.get_team(self.turns.last().unwrap().team) {
             if team.leader != Some(player) {
                 println!("submit_answer: Not correct leader");
                 return;
             }
         }
 
-        if let Some(tile_id) = self.turn.tile {
-            let next_team_id = self.board.get_next_team_id(self.turn.team);
+        if let Some(tile_id) = self.turns.last().unwrap().tile {
+            let next_team_id = self.board.get_next_team_id(self.turns.last().unwrap().team);
             if let Some(tile) = self.board.get_tile(tile_id) {
                 if tile.word == answer {
                     println!("Correct answer! New turn!");
-                    tile.state = Some(self.turn.team);
+                    tile.state = Some(self.turns.last().unwrap().team);
                 } else {
                     println!("Wrong answer. Changing turn");
-                    tile.hints.extend(self.turn.hints.values().cloned());
+                    tile.hints.extend(self.turns.last().unwrap().hints.values().cloned());
                 }
-                self.turn = Turn::new(next_team_id);
+                self.turns.last_mut().unwrap().answer = Some(answer);
+                self.turns.push(Turn::new(next_team_id));
             } else {
                 println!("submit_answer: Invalid tile set");
             }
@@ -99,7 +102,7 @@ impl Game {
 #[derive(Serialize, Debug)]
 pub struct ClientState {
     pub board: Board,
-    pub turn: Turn,
+    pub turns: Vec<Turn>,
 }
 
 #[derive(Serialize, Clone, Debug)]

@@ -79,7 +79,7 @@ impl GameServerState {
     }
 
     fn broadcast_state(&mut self) {
-        println!("get_client_state: {:#?}", self.game.turn);
+        println!("get_client_state: {:#?}", self.game.turns.last().unwrap());
         for sink in self.subscribers.values() {
             let _ = sink.notify(Ok(self.get_client_state())).wait();
         }
@@ -88,7 +88,7 @@ impl GameServerState {
     fn get_client_state(&self) -> ClientState {
         ClientState {
             board: self.game.board.clone(),
-            turn: self.game.turn.clone(),
+            turns: self.game.turns.clone(),
         }
     }
 
@@ -155,7 +155,6 @@ impl GameApi for GameServer {
         state.game.board.add_player(meta.id);
         
         state.subscribers.insert(meta.id, sink);
-        println!("Accepting new subscription with id {}", uuid_string);
 
         state.broadcast_state();
     }
@@ -169,7 +168,6 @@ impl GameApi for GameServer {
 
         let mut state = self.state.lock().unwrap();
         state.subscribers.remove(&uuid);
-        println!("Unsubscribing id {}", uuid.to_string());
 
         if state.game.board.remove_player(uuid) {
             state.reset_game();
