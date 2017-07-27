@@ -98,7 +98,6 @@
                 this.$set(this.currentPlayer, 'team', team.color);
               }
             });
-
             if (team.leader === this.currentPlayer.uuid) {
               this.$set(this.currentPlayer, 'isLeader', true);
               this.$set(this.currentPlayer, 'team', team.color);

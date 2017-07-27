@@ -18,7 +18,8 @@ const app = new Vue({
     return {
       socket: null,
       board: null,
-      gameInput: null
+      gameInput: null,
+      color: 'transparent'
     }
   },
   watch: {
@@ -31,6 +32,9 @@ const app = new Vue({
       if(this.gameInput) {
         this.gameInput.inputEnabled = turn.tile ? true : false;
       }
+    },
+    'board.currentPlayer.team': function(color) {
+      this.updateColor();
     }
   },
   mounted() {
@@ -74,6 +78,24 @@ const app = new Vue({
       console.log("sending with method name and value", method, this.gameInput.value);
       let payload = new JsonRpc(method, [this.gameInput.value],999);
       this.send(payload);
+    },
+    updateColor() {
+      if (!this.board.currentPlayer || !this.board.gameState) {
+        return;
+      }
+      const uuid = this.board.currentPlayer.uuid;
+      for (let team of this.board.gameState.teams) {
+        if (team.leader === uuid) {
+          this.color = team.color;
+          return;
+        }
+        for (let player of team.players) {
+          if (player === uuid) {
+            this.color = team.color;
+            return;
+          }
+        }
+      }
     }
   }
 });
