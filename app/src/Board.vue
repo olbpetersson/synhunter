@@ -33,7 +33,8 @@
         <md-layout md-column class="container">
           <md-layout v-for="row in gameStateView" key="row" class="row">
             <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
-              <tile :tile="tile" :click="chooseTile"
+              <tile :is-selected="isSelectedTile(tile.id)" :tile="tile" :click="chooseTile"
+                    :show-word="isSelectedTile(tile.id) && !isLeader && currentTurn.team === team.id"
                   :enabled="currentTurn.team === team.id && isLeader"
                   :team="findTeam(tile.state)"></tile>
             </md-layout>
@@ -149,6 +150,14 @@
       findTileWord(uuid) {
         let tile = this.gameState.tiles.find((tile) => tile.id === uuid);
         return tile ? tile.word : null;
+      },
+      isSelectedTile(uuid){
+        let tile = this.findTile(uuid);
+        return this.currentTurn ? this.currentTurn.tile && this.currentTurn.tile === uuid : false;
+      },
+      findTile(uuid){
+        let tile = this.gameState.tiles.find((tile) => tile.id === uuid);
+        return tile;
       }
     },
     components: {Tile}
