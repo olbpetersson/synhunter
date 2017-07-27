@@ -1,17 +1,18 @@
 <template>
-  <md-layout md-column>
-    <div v-if="currentPlayer && currentPlayer.isLeader && !gameState.turn.tile">
-      <md-layout md-align="center">
-        <span class="md-headline">You are the leader!</span>
-      </md-layout>
-    </div>
-    <md-layout md-column class="container" v-if="gameStateView && !gameState.turn.tile">
-      <md-layout v-for="row in gameStateView" key="row" class="row">
-        <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
-          <tile :tile="tile" :click="chooseTile"></tile>
+  <md-layout>
+    <md-layout md-column v-if="gameStateView">
+      <div v-if="currentPlayer && currentPlayer.isLeader && !gameState.turn.tile">
+        <md-layout md-align="center">
+          <span class="md-headline">You are the leader!</span>
+        </md-layout>
+      </div>
+      <md-layout md-column class="container" v-if="gameStateView && !gameState.turn.tile">
+        <md-layout v-for="row in gameStateView" key="row" class="row">
+          <md-layout v-for="tile in row" key="tile" class="tile" md-gutter>
+            <tile :tile="tile" :click="chooseTile"></tile>
+          </md-layout>
         </md-layout>
       </md-layout>
-    </md-layout>
       <md-layout md-column class="container" v-if="currentPlayer && currentPlayer.isLeader && gameState.turn.tile ">
           {{gameState.turn.hints}}
           <md-layout v-for="hint in gameState.turn.hints" key="row" class="column">
@@ -22,10 +23,11 @@
       <md-layout md-column class="container" v-if="currentPlayer && !currentPlayer.isLeader && gameState.turn.tile ">
           Give a synonym for: {{ findTileWord(gameState.turn.tile) }}
       </md-layout>
-   <!-- <md-layout md-column md-align="center" md-vertical-align="center" v-else>
+    </md-layout>
+    <md-layout md-column md-align="center" md-vertical-align="center" v-else>
       <md-spinner md-indeterminate></md-spinner>
       <span class="md-title loading-text">Herp Derp...</span>
-    </md-layout>-->
+    </md-layout>
   </md-layout>
 </template>
 <script>
