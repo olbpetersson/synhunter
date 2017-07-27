@@ -127,16 +127,16 @@ impl Board {
     }
 
     pub fn add_player(&mut self, player: PlayerRef) {
-        // let mut smallest_team_size = 999999999;
-        // let mut smallest_team = None;
-        // for team in &mut self.teams {
-        //     if team.team_size() < smallest_team_size {
-        //         smallest_team_size = team.team_size();
-        //         smallest_team = Some(team);
-        //     }
-        // }
-        // smallest_team.unwrap().add_player(player);
-        self.teams[0].add_player(player);
+        let mut smallest_team_size = 999999999;
+        let mut smallest_team = None;
+        for team in &mut self.teams {
+            if team.team_size() < smallest_team_size {
+                smallest_team_size = team.team_size();
+                smallest_team = Some(team);
+            }
+        }
+        smallest_team.unwrap().add_player(player);
+        // self.teams[0].add_player(player);
     }
 
     pub fn remove_player(&mut self, player: PlayerRef) -> bool {
@@ -257,11 +257,9 @@ pub struct Turn {
 
 fn map_values_to_vec<S>(x: &HashMap<PlayerRef, String>, serializer: S) -> Result<S::Ok, S::Error>
 where S: serde::Serializer {
-    println!("map_values_to_vec. from: {:#?}", x);
     let values = x.values();
     let mut seq = serializer.serialize_seq(Some(values.len()))?;
     for value in values {
-        println!("Serializing hint {}", value);
         seq.serialize_element(value)?;
     }
     seq.end()

@@ -79,13 +79,13 @@ impl GameServerState {
     }
 
     fn broadcast_state(&mut self) {
+        println!("get_client_state: {:#?}", self.game.turn);
         for sink in self.subscribers.values() {
             let _ = sink.notify(Ok(self.get_client_state())).wait();
         }
     }
 
     fn get_client_state(&self) -> ClientState {
-        println!("get_client_state: {:#?}", self.game.turn);
         ClientState {
             board: self.game.board.clone(),
             turn: self.game.turn.clone(),
@@ -126,7 +126,7 @@ impl GameApi for GameServer {
     }
 
     fn submit_hint(&self, meta: Self::Metadata, hint: String) -> BoxFuture<(), Error> {
-        let hint = hint.to_lowercase();
+        let hint = hint.trim().to_lowercase();
         let mut state = self.state.lock().unwrap();
         if !state.wordlist.has_word(&hint) {
             println!("Hint not in wordlist");
@@ -138,7 +138,7 @@ impl GameApi for GameServer {
     }
 
     fn submit_answer(&self, meta: Self::Metadata, answer: String) -> BoxFuture<(), Error> {
-        let answer = answer.to_lowercase();
+        let answer = answer.trim().to_lowercase();
         let mut state = self.state.lock().unwrap();
         state.game.submit_answer(meta.id, answer);
         state.broadcast_state();
