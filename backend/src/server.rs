@@ -13,6 +13,7 @@ use std::str::FromStr;
 use structs::{Game, ClientState};
 use wordlist::Wordlist;
 use uuid::Uuid;
+use rand::{self, Rng};
 
 const WORDLIST: &str = "../words/saoldict.txt";
 const EASY_WORDLIST: &str = "../words/easy_words.txt";
@@ -84,6 +85,7 @@ impl GameServerState {
     }
 
     fn get_client_state(&self) -> ClientState {
+        println!("get_client_state: {:#?}", self.game.turn);
         ClientState {
             board: self.game.board.clone(),
             turn: self.game.turn.clone(),
@@ -92,9 +94,11 @@ impl GameServerState {
 
     fn reset_game(&mut self) {
         self.game = Game::new(&self.easy_wordlist);
-        let players: Vec<Uuid> = self.subscribers.keys().cloned().collect();
-        for player in players {
-            self.game.board.add_player(player);
+        let mut players: Vec<Uuid> = self.subscribers.keys().cloned().collect();
+        let mut rng = rand::thread_rng();
+        while !players.is_empty() {
+            let i = rng.gen::<usize>() % players.len();
+            self.game.board.add_player(players.remove(i));
         }
     }
 }
@@ -122,6 +126,7 @@ impl GameApi for GameServer {
     }
 
     fn submit_hint(&self, meta: Self::Metadata, hint: String) -> BoxFuture<(), Error> {
+        let hint = hint.to_lowercase();
         let mut state = self.state.lock().unwrap();
         if !state.wordlist.has_word(&hint) {
             println!("Hint not in wordlist");
@@ -133,6 +138,7 @@ impl GameApi for GameServer {
     }
 
     fn submit_answer(&self, meta: Self::Metadata, answer: String) -> BoxFuture<(), Error> {
+        let answer = answer.to_lowercase();
         let mut state = self.state.lock().unwrap();
         state.game.submit_answer(meta.id, answer);
         state.broadcast_state();

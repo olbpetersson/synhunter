@@ -1,10 +1,13 @@
 use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 use wordlist::Wordlist;
+use serde;
+use serde::ser::SerializeSeq;
 
 pub type PlayerRef = Uuid;
 pub type TeamRef = Uuid;
 
+#[derive(Debug)]
 pub struct Game {
     pub board: Board,
     pub turn: Turn,
@@ -42,15 +45,19 @@ impl Game {
                     println!("submit_hint: Hint same as word. Not allowed!!!");
                     return;
                 }
+            } else {
+                println!("submit_hint: No valid tile in turn");
             }
             if let Some(team) = self.board.get_team(self.turn.team) {
                 if team.has_player_not_leader(player) {
                     if self.turn.hints.contains_key(&player) {
+                        println!("submit_hint: Player not in active team");
                         return;
                     }
                     println!("Player {} added hint {}", player, hint);
                     self.turn.hints.insert(player, hint);
                 } else if self.turn.spyhint.is_none() {
+                    println!("submit_hint: Setting spyhint to {}", hint);
                     self.turn.spyhint = Some(hint);
                 }
             }
@@ -89,13 +96,13 @@ impl Game {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct ClientState {
     pub board: Board,
     pub turn: Turn,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Debug)]
 pub struct Board {
     tiles: Vec<Tile>,
     teams: Vec<Team>,
@@ -165,7 +172,7 @@ impl Board {
     }
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Debug)]
 pub struct Tile {
     id: Uuid,
     word: String,
@@ -187,7 +194,7 @@ impl Tile {
     }
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Debug)]
 pub struct Team {
     id: TeamRef,
     color: String,
@@ -238,13 +245,26 @@ impl Team {
     }
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Debug)]
 pub struct Turn {
     team: TeamRef,
     tile: Option<Uuid>,
+    #[serde(serialize_with="map_values_to_vec")]
     hints: HashMap<PlayerRef, String>,
     spyhint: Option<String>,
     answer: Option<String>,
+}
+
+fn map_values_to_vec<S>(x: &HashMap<PlayerRef, String>, serializer: S) -> Result<S::Ok, S::Error>
+where S: serde::Serializer {
+    println!("map_values_to_vec. from: {:#?}", x);
+    let values = x.values();
+    let mut seq = serializer.serialize_seq(Some(values.len()))?;
+    for value in values {
+        println!("Serializing hint {}", value);
+        seq.serialize_element(value)?;
+    }
+    seq.end()
 }
 
 impl Turn {
