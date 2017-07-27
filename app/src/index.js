@@ -43,6 +43,7 @@ const app = new Vue({
     this.socket = new WebSocket(BASE_URL);
     this.board = this.$refs.board;
     this.gameInput = this.$refs.gameinput;
+    console.log("created a gameInput", this.gameInput);
 
     this.socket.onopen = () => {
       let payload = new JsonRpc('game_subscribe', [], 1);
@@ -96,6 +97,10 @@ const app = new Vue({
           }
         }
       }
+    },
+    resetGame() {
+      let payload = new JsonRpc("reset_game", [], 666);
+      this.send(payload);
     }
   }
 });
